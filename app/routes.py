@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, flash, redirect, request
+from flask import render_template, flash, redirect, request, url_for
 from app.forms import LoginForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
@@ -44,7 +44,7 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-  if current_user.is_authenticated
+  if current_user.is_authenticated:
     return redirect(url_for('index'))
   form = RegistrationForm()
   if form.validate_on_submit():
@@ -56,6 +56,14 @@ def register():
     return redirect(url_for('login'))
   return render_template('register.html', title="Register", form=form)
 
-
+@app.route('/user/<username>')
+@login_required
+def user(username):
+  user = User.query.filter_by(username=username).first_or_404()
+  posts = [
+    { 'author': user, 'body': 'Test post #1' },
+    { 'author': user, 'body': 'Test post #2' }
+  ]
+  return render_template('user.html', user=user, posts=posts )
 
 
